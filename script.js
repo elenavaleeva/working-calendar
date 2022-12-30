@@ -25,6 +25,7 @@ $(function () {
 
 // save reference to important DOM elements
 var timeDisplayEl = $('#time-display');
+let localStorageData = JSON.parse(localStorage.getItem('notes'));
 
 
 function displayTime() {
@@ -35,163 +36,61 @@ displayTime();
 setInterval(displayTime, 1000);
 
 
-var past = document.getElementsByClassName('past');
-var present = document.getElementsByClassName('present');
-var future = document.getElementsByClassName('future');
 
-function  displayColor() {
-  var rightNow = dayjs().format('MMM DD, YYYY [at] hh:mm:ss a');
- var currentTime = dayjs().startOf('hour');
- var rowEl = $('<div .row>');
+var hour = document.querySelectorAll(".time-block");
+console.log(hour);
+var rightNow = timeDisplayEl;
+timeDisplayEl.text(rightNow);
+var currHour = rightNow;
+var currentTime = dayjs().format('H');
+console.log(currentTime);
 
- timeDisplayEl.text(currentTime);
+hour.forEach(function(element) {
+  console.log(element.id.split("-")[1] );
+  let blockTime = element.id.split("-")[1];
 
+  let currentBtn = document.querySelector(`.saveBtn-${blockTime}`);
+  currentBtn.addEventListener('click', function(event){
+    event.preventDefault();
+    let textAreaBlock = event.target.previousElementSibling;
+ let noteObj = {
+  time: blockTime, 
+  note: textAreaBlock.value
 
-     if (currentTime.isBefore(rightNow)) {
-      rowEl.display(past);
-    } else if (currentTime.isSame(rightNow)) {
-      rowEl.addClass('present');
-    }else {
-      rowEl.addClass('future');
-     console.log(past);
-     console.log(present);
-     console.log(future);
-    }
+ }
+ if (localStorageData === null) {
+  localStorageData= [];
+  localStorageData.push(noteObj);
+ }else {
+  localStorageData.push(noteObj);
+ }
+localStorage.setItem(`notes`, JSON.stringify(localStorageData));
+  })
+
+  let currentClass = element.getAttribute("class");
+
+  if (blockTime < currentTime) {
+  element.setAttribute("class", `${currentClass} past`);
+  }else if(blockTime === currentTime) {
+    element.setAttribute("class", `${currentClass} present`);
+  }else if(blockTime > currentTime){
+    element.setAttribute("class", `${currentClass}  future`);
   }
-  displayColor();
-  
-  
+
+
+});
 
 
 
-// var projectDisplayEl = $('#project-display');
-// var projectFormEl = $('#project-form');
-// var projectNameInputEl = $('#project-name-input');
-// var projectTypeInputEl = $('#project-type-input');
-// var projectDateInputEl = $('#project-date-input');
 
 
 
-// // handle displaying the time
-// function displayTime() {
-//   var rightNow = dayjs().format('MMM DD, YYYY [at] hh:mm:ss a');
-//   timeDisplayEl.text(rightNow);
-// }
-
-// // Reads projects from local storage and returns array of project objects.
-// // Returns an empty array ([]) if there aren't any projects.
-// function readProjectsFromStorage() {
-//   var projects = localStorage.getItem('projects');
-//   if (projects) {
-//     projects = JSON.parse(projects);
-//   } else {
-//     projects = [];
-//   }
-//   return projects;
-// }
-
-// // Takes an array of projects and saves them in localStorage.
-// function saveProjectsToStorage(projects) {
-//   localStorage.setItem('projects', JSON.stringify(projects));
-// }
-
-// // Gets project data from local storage and displays it
-// function printProjectData() {
-//   // clear current projects on the page
-//   projectDisplayEl.empty();
-
-//   // get projects from localStorage
-//   var projects = readProjectsFromStorage();
-
-//   // loop through each project and create a row
-//   for (var i = 0; i < projects.length; i += 1) {
-//     var project = projects[i];
-//     var projectDate = dayjs(project.date);
-//     // get date/time for start of today
-//     // var today = dayjs().startOf('day');
-//     var currentTime = dayjs().startOf('hour');
-
-//     // Create row and columns for project
-//     var rowEl = $('<tr>');
-//     var nameEL = $('<td>').text(project.name);
-//     var typeEl = $('<td>').text(project.type);
-//     var dateEl = $('<td>').text(projectDate.format('MM/DD/YYYY'));
-
-//     // Save the index of the project as a data-* attribute on the button. This
-//     // will be used when removing the project from the array.
-//     var deleteEl = $(
-//       '<td><button class="btn btn-sm btn-delete-project" data-index="' +
-//         i +
-//         '">X</button></td>'
-//     );
-
-//     // add class to row by comparing project date to today's date
-//     // if (projectDate.isBefore(today)) {
-//     //   rowEl.addClass('project-late');
-//     // } else if (projectDate.isSame(today)) {
-//     //   rowEl.addClass('project-today');
-//     // }
-
-//     if (projectDate.isBefore(currentTime)) {
-//       rowEl.addClass('past');
-//     } else if (projectDate.isSame(currentTime)) {
-//       rowEl.addClass('present');
-//     }
-
-
-//     // append elements to DOM to display them
-//     rowEl.append(nameEL, typeEl, dateEl, deleteEl);
-//     projectDisplayEl.append(rowEl);
-//   }
-// }
-
-// //Removes a project from local storage and prints the project data
-// function handleDeleteProject() {
-//   var projectIndex = parseInt($(this).attr('data-index'));
-//   var projects = readProjectsFromStorage();
-//   // remove project from the array
-//   projects.splice(projectIndex, 1);
-//   saveProjectsToStorage(projects);
-
-//   // print projects
-//   printProjectData();
-// }
-
-// // Adds a project to local storage and prints the project data
-// function handleProjectFormSubmit(event) {
-//   event.preventDefault();
-
-  // read user input from the form
-  // var projectName = projectNameInputEl.val().trim();
-  // var projectType = projectTypeInputEl.val(); // don't need to trim select input
-  // var projectDate = projectDateInputEl.val(); // yyyy-mm-dd format
-
-  // var newProject = {
-  //   name: projectName,
-  //   type: projectType,
-  //   date: projectDate,
-  // };
-
-  // add project to local storage
-  // var projects = readProjectsFromStorage();
-  // projects.push(newProject);
-  // saveProjectsToStorage(projects);
-
-  // print project data
-  // printProjectData();
-
-  // clear the form inputs
-  // projectNameInputEl.val('');
-  // projectTypeInputEl.val('');
-  // projectDateInputEl.val('');
-// }
-
-// projectFormEl.on('submit', handleProjectFormSubmit);
-
-// Use jQuery event delegation to listen for clicks on dynamically added delete
-// buttons.
-// projectDisplayEl.on('click', '.btn-delete-project', handleDeleteProject);
 
 
 
-// printProjectData();
+
+
+
+
+
+
