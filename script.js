@@ -25,7 +25,7 @@ $(function () {
 
 // save reference to important DOM elements
 var timeDisplayEl = $('#time-display');
-let localStorageData = JSON.parse(localStorage.getItem('notes'));
+//let localStorageData = JSON.parse(localStorage.getItem('notes'));
 
 
 function displayTime() {
@@ -51,11 +51,18 @@ hour.forEach(function(element) {
 
   let currentBtn = document.querySelector(`.saveBtn-${blockTime}`);
   currentBtn.addEventListener('click', function(event){
-    event.preventDefault();
-    let textAreaBlock = event.target.previousElementSibling;
+    let localStorageData = JSON.parse(localStorage.getItem('notes'));
+ 
+    let textAreaBlock;
+    if(event.target.tagName === "I") {
+      textAreaBlock = event.target.parentElement.previousElementSibling;
+    }else if(event.target.tagName === "BUTTON") {
+      textAreaBlock = event.target.previousElementSibling;
+    }
  let noteObj = {
   time: blockTime, 
   note: textAreaBlock.value
+ 
 
  }
  if (localStorageData === null) {
@@ -74,11 +81,22 @@ localStorage.setItem(`notes`, JSON.stringify(localStorageData));
   }else if(blockTime === currentTime) {
     element.setAttribute("class", `${currentClass} present`);
   }else if(blockTime > currentTime){
-    element.setAttribute("class", `${currentClass}  future`);
+    element.setAttribute("class", `${currentClass} future`);
   }
-
+console.log(currentTime);
 
 });
+
+function getFromLocalStorage() {
+  let localStorageData = JSON.parse(localStorage.getItem(`notes`))
+  for (i=0; i < localStorageData.length; i++ ){
+   document.querySelector(`.description-${localStorageData[i].time}`).value= localStorageData[i].note
+
+ 
+  
+}
+}
+getFromLocalStorage()
 
 
 
